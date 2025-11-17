@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <title>随机壁纸</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: #000;
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+        .overlay {
+            background: rgba(0, 0, 0, 0.35);
+            padding: 16px 24px;
+            border-radius: 999px;
+            display: none;
+            gap: 12px;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        .title {
+            font-size: 16px;
+            white-space: nowrap;
+        }
+        .btn {
+            border: none;
+            outline: none;
+            border-radius: 999px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            background: #ffffff;
+            color: #111827;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        }
+        .btn:hover {
+            background: #e5e7eb;
+            transform: translateY(-1px);
+        }
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+        }
+        .btn span.icon {
+            font-size: 16px;
+        }
+        @media (max-width: 600px) {
+            body {
+                background-position: center top;
+            }
+            .overlay {
+                width: calc(100% - 32px);
+                justify-content: space-between;
+                border-radius: 999px;
+            }
+            .title {
+                font-size: 14px;
+            }
+            .btn {
+                padding-inline: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <div class="title">随机壁纸</div>
+        <button class="btn" id="nextBtn">
+            <span class="icon">⟳</span>
+            <span>换一张</span>
+        </button>
+    </div>
+
+    <script>
+        // 本地壁纸列表（相对路径）
+        const images = [
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.20 -17962765.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.22 -18014593.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.36 -18109890.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.36 -18112234.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.36 -18115218.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.36 -18117078.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.36 -18119015.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.36 -18120171.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.36 -18121906.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.36 -18123234.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.37 -18124578.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.37 -18125859.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.37 -18127953.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.37 -18130109.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.37 -18131796.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.37 -18133046.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.37 -18134140.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.37 -18135343.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.38 -18136796.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.38 -18138593.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.38 -18150562.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.38 -18153671.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.39 -18271031.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.42 -18324484.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.45 -18341890.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.45 -18371312.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.45 -18378281.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.55 -18459421.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.55 -18469140.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.55 -18475312.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.55 -18478484.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.56 -18481718.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.56 -18483656.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.57 -18487312.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.57 -18489781.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.58 -18505890.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.58 -18507578.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.58 -18508937.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.58 -18516937.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.01.09 -18606843.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.01.10 -18616125.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.01.10 -18618375.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.01.10 -18625140.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.01.14 -18671062.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.01.14 -18689328.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.01.15 -18693593.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.01.15 -18695000.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.01.15 -18696859.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.01.15 -18698250.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.01.15 -18700062.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.01.15 -18701609.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.01.16 -18703078.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.06.56 -19000046.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.07.06 -19025343.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.07.07 -19053484.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.07.26 -19082640.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.13.16 -19189421.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - Preview 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.33 -17044546.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - Preview 05 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.14 -17217312.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - Preview 05 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.14 -17232546.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - Preview 05 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.14 -17246390.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - Preview 05 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.15 -17250140.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - Preview 07 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.25 -17427906.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - Preview 08 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.37 -17493187.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - Preview 10 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.17 -17704046.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - Preview 10 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.17 -17707218.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - Preview 10 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.17 -17731750.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - Preview 10 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.17 -17736859.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - Preview 10 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.17 -17740953.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - Preview 10 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.17 -17749046.PNG",
+            "wallpaper/[SweetSub] Shoushimin Series - Preview 10 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.24 -17831500.PNG"
+        ];
+
+        const STATE_KEY = "rw_state_v1";
+        const STATE_VERSION = images.join("|");
+
+        function shuffleOrder(length) {
+            const arr = [];
+            for (let i = 0; i < length; i++) {
+                arr.push(i);
+            }
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const tmp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = tmp;
+            }
+            return arr;
+        }
+
+        function loadState() {
+            try {
+                const raw = window.localStorage.getItem(STATE_KEY);
+                if (!raw) return null;
+                const data = JSON.parse(raw);
+                if (!data || data.version !== STATE_VERSION) return null;
+                if (!Array.isArray(data.order)) return null;
+                if (typeof data.position !== "number") return null;
+                if (data.order.length !== images.length) return null;
+                return data;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function saveState(state) {
+            try {
+                window.localStorage.setItem(STATE_KEY, JSON.stringify(state));
+            } catch (e) {
+                // ignore
+            }
+        }
+
+        function createInitialState() {
+            return {
+                version: STATE_VERSION,
+                order: shuffleOrder(images.length),
+                position: -1
+            };
+        }
+
+        let playState = loadState() || createInitialState();
+
+        function getNextIndex() {
+            if (!playState || !Array.isArray(playState.order) || playState.order.length === 0) {
+                return -1;
+            }
+            playState.position++;
+            if (playState.position >= playState.order.length) {
+                playState.order = shuffleOrder(images.length);
+                playState.position = 0;
+            }
+            saveState(playState);
+            return playState.order[playState.position];
+        }
+
+        function setRandomWallpaper() {
+            const idx = getNextIndex();
+            if (idx === -1) return;
+            const src = images[idx];
+            document.body.style.backgroundImage = `url("${src}")`;
+        }
+
+        const nextBtn = document.getElementById("nextBtn");
+        if (nextBtn) {
+            nextBtn.addEventListener("click", function () {
+                setRandomWallpaper();
+            });
+        }
+
+        // 初次加载时按轮询顺序展示一张
+        setRandomWallpaper();
+    </script>
+</body>
+</html>
