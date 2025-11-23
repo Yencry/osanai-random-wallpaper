@@ -22,11 +22,6 @@
             background-repeat: no-repeat;
             color: #fff;
         }
-        @media (max-width: 600px) {
-            body {
-                background-position: center top;
-            }
-        }
     </style>
 </head>
 <body>
@@ -112,26 +107,11 @@
         }
 
         function loadState() {
-            try {
-                const raw = window.localStorage.getItem(STATE_KEY);
-                if (!raw) return null;
-                const data = JSON.parse(raw);
-                if (!data || data.version !== STATE_VERSION) return null;
-                if (!Array.isArray(data.order)) return null;
-                if (typeof data.position !== "number") return null;
-                if (data.order.length !== images.length) return null;
-                return data;
-            } catch (e) {
-                return null;
-            }
+            return null;
         }
 
         function saveState(state) {
-            try {
-                window.localStorage.setItem(STATE_KEY, JSON.stringify(state));
-            } catch (e) {
-                // ignore
-            }
+            // ignore
         }
 
         function createInitialState() {

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
-    <title>随机壁纸</title>
+    <title>JPG 随机壁纸</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         * {
@@ -20,76 +20,13 @@
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: #fff;
-        }
-        .overlay {
-            background: rgba(0, 0, 0, 0.35);
-            padding: 16px 24px;
-            border-radius: 999px;
-            display: none;
-            gap: 12px;
-            align-items: center;
-            backdrop-filter: blur(10px);
-        }
-        .title {
-            font-size: 16px;
-            white-space: nowrap;
-        }
-        .btn {
-            border: none;
-            outline: none;
-            border-radius: 999px;
-            padding: 8px 16px;
-            font-size: 14px;
-            cursor: pointer;
-            background: #ffffff;
-            color: #111827;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-        }
-        .btn:hover {
-            background: #e5e7eb;
-            transform: translateY(-1px);
-        }
-        .btn:active {
-            transform: translateY(0);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-        }
-        .btn span.icon {
-            font-size: 16px;
-        }
-        @media (max-width: 600px) {
-            .overlay {
-                width: calc(100% - 32px);
-                justify-content: space-between;
-                border-radius: 999px;
-            }
-            .title {
-                font-size: 14px;
-            }
-            .btn {
-                padding-inline: 14px;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="overlay">
-        <div class="title">随机壁纸</div>
-        <button class="btn" id="nextBtn">
-            <span class="icon">⟳</span>
-            <span>换一张</span>
-        </button>
-    </div>
-
     <script>
-        // 本地壁纸列表（相对路径）
+        // 基于原始 PNG 路径的列表
         const images = [
             "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.20 -17962765_cleaned.png",
             "wallpaper/[SweetSub] Shoushimin Series - 01 [WebRip][1080P][AVC 8bit][CHS].mp4 @0.00.22 -18014593_cleaned.png",
@@ -151,7 +88,7 @@
             "wallpaper/Generated Image November 20, 2025 - 9_59AM.png"
         ];
 
-        const STATE_KEY = "rw_state_v1";
+        const STATE_KEY = "rw_jpg_state_v1";
         const STATE_VERSION = images.join("|");
 
         function shuffleOrder(length) {
@@ -202,18 +139,15 @@
         function setRandomWallpaper() {
             const idx = getNextIndex();
             if (idx === -1) return;
-            const src = images[idx];
+
+            const pngPath = images[idx];
+            const base = pngPath.replace(/\.PNG$/i, "");
+            const src = base + ".jpg";
+
             document.body.style.backgroundImage = `url("${src}")`;
+            document.body.style.webkitBackgroundImage = document.body.style.backgroundImage;
         }
 
-        const nextBtn = document.getElementById("nextBtn");
-        if (nextBtn) {
-            nextBtn.addEventListener("click", function () {
-                setRandomWallpaper();
-            });
-        }
-
-        // 初次加载时按轮询顺序展示一张
         setRandomWallpaper();
     </script>
 </body>
